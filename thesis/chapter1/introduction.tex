@@ -1,0 +1,58 @@
+% Chapter 1: Introduction.
+% Template guidance: background, problem statement, objectives, research questions,
+% scope, significance, definitions. Each section below says what it should contain.
+
+\section{Background of the Study}
+% Context: anomaly detection in stock markets (surveillance, risk, manipulation);
+% volatility clustering in daily returns; emerging and frontier markets such as the DSE,
+% where data are short, noisy and shaped by regulation.
+\todo{Background: market anomalies, volatility clustering, why emerging markets such as the DSE are hard.}
+Relevant surveys: \cite{ahmed2016survey,hilal2022financial}.
+
+\section{Problem Statement}
+% The gap: deep detectors trained on raw returns tend to flag calm-versus-turbulent
+% regime shifts rather than genuinely unusual days, and no deep, out-of-sample anomaly
+% study exists for the DSE. Who is affected (regulators, investors) and why it matters.
+\todo{Problem statement: raw-return detectors confuse volatility regimes with anomalies; no deep anomaly work on the DSE.}
+
+\section{Research Objectives}
+
+\subsection*{General Objective}
+\todo{General objective: build and evaluate a volatility-aware deep anomaly detector that transfers from global markets to the DSE.}
+
+\subsection*{Specific Objectives}
+\begin{itemize}
+    \item \todo{Construct leakage-safe anomaly labels for global indices and the DSE using GARCH-family models fitted on training data only.}
+    \item \todo{Compare autoencoder detectors on raw returns against GARCH-standardized returns.}
+    \item \todo{Measure how well detectors trained on global markets transfer to the DSE (zero-shot versus fine-tuned).}
+    \item \todo{Evaluate with event-based F1 alongside point-adjusted F1 and quantify the gap between them.}
+\end{itemize}
+
+\section{Research Questions}
+\begin{enumerate}
+    \item \todo{RQ1: Does GARCH standardization reduce regime-driven false alarms of deep detectors?}
+    \item \todo{RQ2: Do detectors trained on global markets transfer to the DSE, and does fine-tuning help?}
+    \item \todo{RQ3: How much does point adjustment inflate reported performance on financial series?}
+\end{enumerate}
+
+\section{Scope and Delimitation}
+% Daily data only (intraday DSE data is paid-only). DSEX from January 2013; liquid DSE stocks.
+% Periods affected by BSEC floor prices need special handling. Time-based splits only.
+\todo{Scope: daily frequency, markets and date ranges, stocks included, floor-price periods, what is out of scope.}
+
+\section{Significance of the Study}
+\todo{Significance: first deep out-of-sample anomaly study on the DSE; evidence on volatility-aware inputs; a reproducible labelled DSE series.}
+
+\section{Definition of Terms}
+\begin{itemize}
+    \item \textbf{Anomaly:} \todo{working definition used in this thesis.}
+    \item \textbf{Volatility clustering:} \todo{definition.}
+    \item \textbf{GARCH-standardized return:} the return innovation divided by its conditional standard deviation, $z_t = \varepsilon_t / \sigma_t$.
+    \item \textbf{Transfer learning:} \todo{definition as used here (train on global markets, apply to the DSE).}
+\end{itemize}
+
+\section{Organization of the Thesis}
+Chapter~2 reviews related work on volatility modelling, financial and time-series anomaly
+detection, evaluation practice and transfer learning. Chapter~3 describes the data,
+labelling, models and evaluation protocol. Chapter~4 reports and discusses the results.
+Chapter~5 summarizes the findings, limitations and future work.

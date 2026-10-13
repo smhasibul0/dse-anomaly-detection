@@ -1,0 +1,61 @@
+% Chapter 2: Literature Review (the paper plan's "Related Work").
+% Source: /mnt/project-files/literature/literature_table.xlsx (Papers and Gaps tabs).
+% "Observed" limitations in that table must be checked against the full text before use.
+
+\section{Introduction}
+\todo{Scope of the review and the themes covered below.}
+
+\section{Theoretical Background}
+
+\subsection{Volatility Clustering and GARCH-Family Models}
+% GARCH(1,1), EGARCH, GJR; Student-t innovations; standardized residuals.
+\todo{Explain conditional heteroskedasticity and the GARCH, EGARCH and GJR specifications.}
+
+\subsection{Anomalies in Financial Time Series}
+\todo{Point versus contextual versus collective anomalies; what counts as an anomaly in returns.}
+
+\section{Review of Key Themes}
+
+\subsection{GARCH Models Combined with Deep Learning}
+\todo{Hybrid GARCH-LSTM models are used for volatility forecasting, not detection.}
+Key sources: \cite{kim2018forecasting,koo2022hybrid}.
+
+\subsection{Outliers in GARCH Estimation}
+\todo{Outliers bias GARCH fits; motivates fitting on training data only.}
+Key source: \cite{charles2005outliers}.
+
+\subsection{Volatility Studies of the Dhaka Stock Exchange}
+\todo{Existing DSE work is GARCH-only and in-sample.}
+Key sources: \cite{siddikee2016volatility,haque2021modeling}.
+
+\subsection{Anomaly Detection in Financial Markets}
+\todo{Manipulation and anomaly detection in stock markets, including emerging markets; small or synthetic label sets.}
+Key sources: \cite{ahmed2016survey,hilal2022financial,golmohammadi2015time,leangarun2021stock,chullamonthon2023ensemble,mariani2021autoencoder}.
+
+\subsection{Deep Time-Series Anomaly Detection Methods}
+\todo{Reconstruction- and prediction-based detectors: LSTM encoder-decoders, LSTM forecasting with dynamic thresholds, VAEs, transformers.}
+Key sources: \cite{malhotra2016lstm,hundman2018detecting,xu2018unsupervised,xu2022anomaly}.
+
+\subsection{Evaluation of Time-Series Anomaly Detection}
+\todo{Point adjustment inflates scores; range-based and threshold-free alternatives; flawed benchmarks.}
+Key sources: \cite{tatbul2018precision,kim2022towards,wu2023current,paparrizos2022tsb,paparrizos2022volume,schmidl2022anomaly}.
+
+\subsection{Transfer Learning in Finance}
+\todo{Cross-market and cross-strategy transfer for prediction and trading.}
+Key sources: \cite{koshiyama2022quantnet,nguyen2019novel}.
+
+\section{Critical Analysis and Research Gaps}
+% From the Gaps tab of the literature table. Check each against the full texts.
+\begin{enumerate}
+    \item GARCH combined with deep learning is used almost only for volatility forecasting, not anomaly detection.
+    \item Financial anomaly studies rarely control for volatility clustering, so detectors may flag regime shifts as anomalies.
+    \item There is no deep anomaly detection work on the DSE; DSE literature is GARCH-only and in-sample.
+    \item Cross-market transfer has been studied for trading and prediction, not for anomaly detection into a frontier market.
+    \item Financial anomaly labels are tiny or purely synthetic.
+    \item Point-adjust inflation is documented on industrial benchmarks but not measured on financial data.
+    \item Standard time-series anomaly benchmarks contain no financial series.
+\end{enumerate}
+\todo{Turn the list into prose with citations, and say which gaps this thesis addresses.}
+
+\section{Summary of Literature Review}
+\todo{What is known, the gaps, and how Chapter 3 addresses them.}

@@ -1,0 +1,78 @@
+% Chapter 3: Methodology (the paper plan's "Data and Labeling" and "Method").
+% Project rules that must hold throughout: time-based splits only, volatility models
+% fitted on the training block only, fixed seeds (config.yaml, seed 42).
+
+\section{Introduction}
+\todo{Overview of the quantitative, experimental design and the structure of this chapter.}
+
+\section{Research Design}
+% Experimental, deductive. Two comparisons drive the thesis:
+% (1) raw versus GARCH-standardized inputs; (2) global-to-DSE transfer.
+\todo{Research design and how each research question maps to an experiment.}
+
+\section{Data Collection}
+
+\subsection{Global Market Data}
+\todo{Indices, source (e.g., Yahoo Finance), date ranges.}
+
+\subsection{Dhaka Stock Exchange Data}
+% DSEX from January 2013 (do not splice DGEN). Stocks from the DSE day-end archive,
+% cross-checked against the Mendeley dataset. Scripts: scripts/fetch_dse.py, scripts/qc_dse.py.
+\todo{DSEX and stock sources, coverage, and quality checks.}
+
+\section{Data Cleaning and Preprocessing}
+% DSE traps: BSEC floor prices (about Mar 2020 to Jun 2021 and Jul 2022 to Jan 2024),
+% unadjusted bonus shares, missing trading days.
+\todo{Return computation, corporate-action adjustment, treatment of floor-price periods.}
+
+\section{Train, Validation and Test Splits}
+\todo{Date boundaries for each market; justify time-based splits and the absence of shuffling.}
+
+\section{Volatility Modelling and Standardization}
+% GARCH(1,1), EGARCH(1,1,1), GJR(1,1,1) with Student-t errors, fitted on train only.
+% Select the model on validation residual diagnostics (Ljung-Box, ARCH-LM), not training BIC alone.
+% Rolling or expanding re-fits before labels are frozen.
+\todo{Model specifications, estimation, model selection and the standardized residual $z_t = \varepsilon_t/\sigma_t$.}
+
+\begin{equation}
+\sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2
+\end{equation}
+
+\section{Anomaly Label Construction}
+% Three label sources: known market events, extreme standardized residuals, injected anomalies.
+\todo{Define each label source, its thresholds, and how labels are kept out of model training.}
+
+\section{Detection Models}
+
+\subsection{Baselines}
+\todo{Statistical and classical baselines (e.g., raw-return z-score, GARCH residual threshold).}
+
+\subsection{Autoencoder on Raw versus GARCH-Standardized Returns}
+\todo{Architecture, window length, anomaly score $s_t$ and threshold $\tau$; identical settings for both input types.}
+
+\section{Transfer Learning Protocol}
+\todo{Train on global markets, apply to the DSE zero-shot and after fine-tuning; what is frozen and what is re-fitted.}
+
+\section{Evaluation Metrics}
+% Report event-based F1 together with point-adjusted F1 (and PA%K), and quantify the gap.
+\todo{Define event-based precision, recall and F1, point adjustment, and PA\%K.}
+
+\begin{equation}
+Precision=\frac{TP}{TP+FP}, \qquad Recall=\frac{TP}{TP+FN}
+\end{equation}
+
+\begin{equation}
+F_1=\frac{2\times Precision \times Recall}{Precision+Recall}
+\end{equation}
+
+\section{Reproducibility}
+\todo{Seeds, software versions, code repository, data availability.}
+
+\section{Ethical Considerations}
+\todo{Public market data only; no personal data; licence terms of the data sources.}
+
+\section{Limitations of the Methodology}
+\todo{Daily data only, label uncertainty, regulatory distortions in DSE prices.}
+
+\section{Summary of the Chapter}
+\todo{Recap of data, labels, models and evaluation.}

@@ -1,0 +1,144 @@
+\documentclass[a4paper,12pt]{classes/uuthesis}
+\usepackage{times}
+\usepackage[left=3cm,right=3cm,top=3cm]{geometry}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{multicol}
+%\setcounter{secnumdepth}{2}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+\usepackage{lipsum}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{ragged2e}
+\usepackage{hyperref}
+\usepackage{breakurl} % or use \url{}
+
+% ============================================
+% CHAPTER TITLE STYLE (Clean Roman Chapter Numbers)
+% ============================================
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\centering}
+  {Chapter \arabic{chapter}:}{1em}{}
+
+% ============================================
+% TOC Formatting
+% ============================================
+\usepackage{tocloft}
+\renewcommand{\cftchappresnum}{CHAPTER~\Roman{chapter}:~}
+\renewcommand{\cftchapaftersnum}{}
+\setlength{\cftchapnumwidth}{7em} % Adjust space so titles don't overlap
+
+% ============================================
+% Numbering for sections and subsections
+% ============================================
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{chapter}.\arabic{section}.\arabic{subsection}}
+\numberwithin{figure}{chapter}
+\numberwithin{table}{chapter}
+
+% ============================================
+% Project metadata (edit here; used across the front matter)
+% ============================================
+\input{frontmatters/metadata}
+
+% ============================================
+% Documents
+% ============================================
+\begin{document}
+\pagenumbering{roman}
+
+\input{frontmatters/title}
+\newpage
+
+\addcontentsline{toc}{chapter}{Title page}
+\input{frontmatters/2ndpage}
+
+\newpage
+\addcontentsline{toc}{chapter}{Abstract}
+\chapter*{\centering Abstract}
+\input{frontmatters/abstract}
+
+\newpage
+\addcontentsline{toc}{chapter}{Clearance Page}
+\input{frontmatters/clearance}
+
+\newpage
+\addcontentsline{toc}{chapter}{Submission Page}
+\input{frontmatters/declaration}
+
+\newpage
+\addcontentsline{toc}{chapter}{Copyright}
+\input{frontmatters/copyright}
+
+\newpage
+\addcontentsline{toc}{chapter}{Dedication}
+\chapter*{\centering Dedication}
+\input{frontmatters/dedication}
+
+\newpage
+\addcontentsline{toc}{chapter}{Acknowledgment}
+ \chapter*{\centering Acknowledgment}
+\input{frontmatters/acknowledgment}
+
+\newpage
+\addcontentsline{toc}{chapter}{Table of Contents}
+\tableofcontents
+
+\newpage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\newpage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\newpage
+\addcontentsline{toc}{chapter}{Symbols}
+\chapter*{\centering Symbols}
+\input{frontmatters/symbol}
+
+\newpage
+\addcontentsline{toc}{chapter}{Abbreviation}
+\chapter*{\centering List of Abbreviation}
+\input{frontmatters/abbreviation}
+
+\newpage
+\addcontentsline{toc}{chapter}{Appendices}
+\chapter*{\centering Appendices}
+\input{backmatters/listofappendices}
+
+\newpage
+\pagenumbering{arabic}
+\chapter[Introduction]{Introduction}
+\input{chapter1/introduction}
+
+\chapter{Literature Review}
+\input{chapter2/review}
+
+\chapter{Methodology} 
+\input{chapter3/methodology}
+
+\chapter{Results and Analysis}
+\input{chapter4/results}
+
+\chapter{Conclusion}
+\input{chapter5/conclusion}
+
+\renewcommand\bibname{References}
+\bibliographystyle{IEEEtran}
+\bibliography{backmatters/references}
+\addcontentsline{toc}{chapter}{References}
+
+%\chapter{Appendix}
+\include{backmatters/appendix}
+
+\end{document}
