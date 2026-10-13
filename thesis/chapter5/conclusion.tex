@@ -14,29 +14,31 @@ repository is set up, and a first volatility model run on S\&P~500 data has shap
 design.
 
 \section{Work Plan}
-The project runs over 14 weeks after an initial validation phase. Table~\ref{tab:plan}
-lists the phases.
+The work proceeds in five phases, each ending with a milestone that must be reached before
+the next phase depends on it. Table~\ref{tab:plan} lists them in order.
 
 \begin{table}[H]
 \caption{Work plan.}
 \label{tab:plan}
 \begin{center}
-\begin{tabular}{p{1.6cm} p{3.2cm} p{8.4cm}}
+\begin{tabular}{p{0.5cm} p{2.6cm} p{6.0cm} p{4.0cm}}
 \hline
-Weeks & Phase & Work \\
+ & Phase & Work & Milestone \\
 \hline
-0 & Validation & DSE data sources identified (download not yet run); literature review
-of 23 papers; first GARCH run; code repository and seed policy; scope agreed with the
+1 & Validation & DSE data sources identified (download not yet run); literature review
+of 23 papers; first GARCH run; code repository and seed policy & Scope agreed with the
 supervisor \\
-1--3 & Proposal and setup & Research questions and hypotheses; proposal defense; global
-and DSE data collection; DSE quality check against the go/no-go criteria \\
-3--6 & Data and labels & Cleaning (missing days, halts, floor prices, bonus shares, price
+2 & Proposal and setup & Research questions and hypotheses; global and DSE data collection;
+DSE quality check & Proposal defended; DSE data pass the go/no-go criteria, or the
+fallback market is chosen \\
+3 & Data and labels & Cleaning (missing days, halts, floor prices, bonus shares, price
 limits); GARCH, EGARCH and GJR fits with diagnostics; known-event, residual and injected
-labels; labelling rules fixed \\
-6--10 & Models and experiments & Baselines; raw versus standardized autoencoder; transfer
-from global indices to the DSE; five-seed evaluation; regime analysis \\
-10--14 & Writing and submission & Thesis book; code release; data release if licensing
-allows; IEEE paper draft \\
+labels & Labelling rules fixed before any detector is trained \\
+4 & Models and experiments & Baselines; raw versus standardized autoencoder; transfer
+from global indices to the DSE; five-seed evaluation; regime analysis & All results
+reported over five seeds \\
+5 & Writing and submission & Thesis book; code release; data release if licensing allows;
+IEEE paper draft & Thesis submitted \\
 \hline
 \end{tabular}
 \end{center}
