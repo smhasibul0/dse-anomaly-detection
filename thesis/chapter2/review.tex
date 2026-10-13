@@ -1,0 +1,194 @@
+% Chapter 2: Literature Review (the paper plan's "Related Work").
+% Source: /mnt/project-files/literature/literature_table.xlsx (Papers and Gaps tabs).
+% Limitations marked "Observed" in that table are the team's reading, not the authors'
+% claims. They are written below as descriptions of what each study did, and should be
+% checked against the full texts before submission.
+
+\section{Introduction}
+This chapter reviews the work this thesis builds on. Section~\ref{sec:lr-theory} sets out
+the volatility models and the notion of an anomaly used throughout. Section~\ref{sec:lr-themes}
+reviews seven bodies of work: hybrid GARCH and deep learning models, outliers in GARCH
+estimation, volatility studies of the Dhaka Stock Exchange (DSE), anomaly detection in
+financial markets, deep time-series anomaly detection, the evaluation of such detectors,
+and transfer learning in finance. Section~\ref{sec:lr-gaps} lists the gaps that motivate
+this study.
+
+\section{Theoretical Background}\label{sec:lr-theory}
+
+\subsection{Volatility Clustering and GARCH-Family Models}
+Daily stock returns are close to uncorrelated, but their magnitude is not: large moves
+tend to follow large moves. Engle's ARCH model~\cite{engle1982autoregressive} captured this
+by letting the conditional variance depend on past squared innovations, and
+Bollerslev's GARCH model~\cite{bollerslev1986generalized} added a dependence on past
+conditional variance, which gives a parsimonious description of persistent volatility.
+Two extensions allow negative shocks to raise volatility more than positive shocks of the
+same size: EGARCH~\cite{nelson1991conditional}, which models the logarithm of the variance,
+and the GJR model~\cite{glosten1993relation}, which adds a term that is active only after
+negative returns. Chapter~\ref{ch:method} gives the equations used in this thesis.
+
+Dividing each return innovation by its conditional standard deviation gives a standardized
+residual, $z_t = \varepsilon_t/\sigma_t$. If the volatility model is adequate, $z_t$ has no
+remaining volatility clustering, so a day with a large $|z_t|$ is unusual relative to the
+volatility of its own period rather than relative to the whole sample.
+
+\subsection{Anomalies in Financial Time Series}
+Anomalies in time series are commonly divided into three kinds. A point anomaly is a
+single observation that is unusual compared with the rest of the data. A contextual anomaly
+is unusual only given its context, such as its time or the behaviour of related series; a
+value that is normal in one setting can be anomalous in another. A collective anomaly is a
+sequence of observations that is unusual as a whole, even if no single value is.
+Golmohammadi and Zaiane~\cite{golmohammadi2015time} treat market manipulation as a
+contextual anomaly, using a stock's peer group as the context.
+
+This thesis treats the volatility of the surrounding period as the context. A return is
+anomalous if it is extreme relative to the conditional volatility at that time, so the same
+fall can be anomalous in a calm year and normal in a crisis. Documented market events,
+which may last several days, are treated as collective anomalies and evaluated as segments.
+
+\section{Review of Key Themes}\label{sec:lr-themes}
+
+\subsection{GARCH Models Combined with Deep Learning}
+Kim and Won~\cite{kim2018forecasting} fed the outputs of GARCH, EGARCH and EWMA models
+into an LSTM and forecast the realized volatility of the KOSPI~200 index, reporting lower
+errors than either the econometric models or the networks alone. Koo et
+al.~\cite{koo2022hybrid} combined GARCH-type inputs with a root-type transform of the
+volatility distribution before an LSTM, motivated by the observation that volatility is
+concentrated near zero, so a network trained on the raw distribution fits the common
+region and misses the tail. They report a 21\% reduction in RMSE over earlier LSTM-GARCH
+hybrids on S\&P~500 realized volatility.
+
+Both studies use GARCH output to improve a volatility forecast on a single index. Neither
+addresses anomaly detection. The second study's motivation is relevant here: if a network
+trained on raw values under-fits the tail, a transform that removes the volatility level
+may help a detector separate unusual days from merely turbulent ones. This thesis tests
+that idea with GARCH standardization.
+
+\subsection{Outliers in GARCH Estimation}
+Charles and Darn{\'e}~\cite{charles2005outliers} showed that outliers in daily returns
+bias GARCH parameter estimates and test statistics, and proposed a procedure to detect and
+correct them during estimation. Their work treats outliers as a nuisance for estimation
+rather than as targets. For this thesis it has two consequences. Labelling a day as
+anomalous from an extreme standardized residual is an established idea, and extreme days in
+the estimation window will distort the fitted model, which is one reason the volatility
+models here are estimated on the training block only.
+
+\subsection{Volatility Studies of the Dhaka Stock Exchange}
+Siddikee et al.~\cite{siddikee2016volatility} fitted GARCH(1,1) and ARCH models to the DSE
+General Index (DGEN) from January 2002 to July 2013 and identified an episode of abnormal
+volatility between 2009 and 2012, peaking in the first half of 2011. They report that
+GARCH could not be applied in some years and used ARCH instead. Haque et
+al.~\cite{haque2021modeling} fitted long-memory models (FIGARCH, FIEGARCH, FIAPARCH and
+HYGARCH) to the DSEX and DSES indices and examined asymmetry through news impact curves.
+
+Both studies are in-sample descriptions of DSE volatility. Neither evaluates models out of
+sample or addresses anomaly detection. The DGEN series studied by Siddikee et al.\ was
+replaced by DSEX in 2013, so their sample and the DSEX series used in this thesis do not
+overlap.
+
+\subsection{Anomaly Detection in Financial Markets}
+Two surveys frame the area. Ahmed et al.~\cite{ahmed2016survey} review anomaly detection
+for financial fraud, with an emphasis on clustering methods, and Hilal et
+al.~\cite{hilal2022financial} review supervised, unsupervised and semi-supervised fraud
+detection, including deep learning, and identify the scarcity of public labelled data as a
+recurring obstacle.
+
+Work on stock markets faces the same labelling problem. Golmohammadi and
+Zaiane~\cite{golmohammadi2015time} detected contextual anomalies in S\&P~500 constituents
+by comparing each stock with its peer group, and evaluated on injected synthetic anomalies
+because confirmed manipulation cases were not available. On the Stock Exchange of Thailand,
+Leangarun et al.~\cite{leangarun2021stock} trained an autoencoder and a GAN on normal
+limit-order-book behaviour and detected five of six prosecuted manipulation cases, and
+Chullamonthon et al.~\cite{chullamonthon2023ensemble} stacked an LSTM classifier and an
+LSTM autoencoder with an SVM and detected all six. Six cases are too few to support
+statistical comparisons between methods. Mariani et al.~\cite{mariani2021autoencoder}
+applied LSTM, bidirectional LSTM and convolutional autoencoders to the IBOVESPA index and
+flagged days with high reconstruction error, without a defined ground truth.
+
+None of these studies adjusts its inputs for volatility clustering, and each is confined to
+a single market.
+
+\subsection{Deep Time-Series Anomaly Detection Methods}
+Most deep detectors for time series score a point by how poorly a model trained on normal
+data reconstructs or predicts it. Malhotra et al.~\cite{malhotra2016lstm} used an LSTM
+encoder-decoder and scored windows by reconstruction error on sensor and medical data.
+Hundman et al.~\cite{hundman2018detecting} forecast spacecraft telemetry with an LSTM and set
+thresholds on the forecast errors with a nonparametric dynamic method. Xu et
+al.~\cite{xu2018unsupervised} trained a variational autoencoder (Donut) on sliding windows
+of web-service KPIs. Xu et al.~\cite{xu2022anomaly} proposed the Anomaly Transformer, which
+scores points by an association-discrepancy criterion.
+
+These methods were developed and tested on sensor, telemetry and operations data. None was
+evaluated on financial returns, whose variance changes over time. A reconstruction-error
+detector trained on raw returns will tend to score every day of a high-volatility period as
+anomalous, which is the behaviour this thesis aims to measure and reduce.
+
+\subsection{Evaluation of Time-Series Anomaly Detection}
+Several papers question how these detectors are evaluated. Xu et
+al.~\cite{xu2018unsupervised} introduced point adjustment: if any point inside a labelled
+anomalous segment is detected, every point in the segment is counted as detected. Kim et
+al.~\cite{kim2022towards} showed that under point adjustment, random anomaly scores can
+match published state-of-the-art results, and proposed PA\%K, which credits a segment only
+if at least $K$\% of its points are detected. Tatbul et al.~\cite{tatbul2018precision}
+defined range-based precision and recall with tunable terms for existence, overlap,
+position and cardinality. Paparrizos et al.~\cite{paparrizos2022volume} proposed the
+threshold-free VUS-ROC and VUS-PR measures, which tolerate small lags between predicted and
+true anomalies.
+
+The benchmarks themselves have also been criticised. Wu and
+Keogh~\cite{wu2023current} argue that widely used benchmarks are often trivial, have
+unrealistic anomaly densities and contain labelling errors, and they released the UCR
+anomaly archive. TSB-UAD~\cite{paparrizos2022tsb} and the evaluation by Schmidl et
+al.~\cite{schmidl2022anomaly} compare many detectors on large collections of real and
+synthetic series. Schmidl et al.\ report that no single algorithm wins and that simple
+methods are often competitive. Neither collection includes financial series.
+
+This thesis therefore reports event-based F1 alongside point-adjusted F1 and PA\%K, and
+includes simple statistical baselines.
+
+\subsection{Transfer Learning in Finance}
+Koshiyama et al.~\cite{koshiyama2022quantnet} trained QuantNet, which shares a
+market-agnostic layer across equity markets and adds market-specific encoders and decoders,
+and measured gains in trading performance (Sharpe and Calmar ratios). Nguyen and
+Yoon~\cite{nguyen2019novel} pretrained an LSTM on a large pool of stocks and fine-tuned it to
+predict short-term price movements of target stocks. Both target prediction or trading
+rather than detection, and neither transfers into a frontier market such as Bangladesh.
+
+\section{Critical Analysis and Research Gaps}\label{sec:lr-gaps}
+The review points to seven gaps.
+
+\begin{enumerate}
+    \item Hybrid GARCH and deep learning models are used for volatility forecasting
+    \cite{kim2018forecasting,koo2022hybrid}. None of the studies reviewed uses
+    GARCH-standardized returns as the input to a deep anomaly detector.
+    \item Anomaly detectors applied to stock data do not adjust for volatility
+    clustering~\cite{golmohammadi2015time,mariani2021autoencoder}, so calm and turbulent
+    periods are scored on the same scale.
+    \item Published DSE studies fit GARCH-family models in
+    sample~\cite{siddikee2016volatility,haque2021modeling}. None of the studies reviewed
+    applies deep or out-of-sample anomaly detection to the DSE.
+    \item Cross-market transfer has been studied for trading and price
+    prediction~\cite{koshiyama2022quantnet,nguyen2019novel}, not for anomaly detection into a
+    frontier market.
+    \item Labels in financial anomaly studies are either very few real cases
+    \cite{leangarun2021stock,chullamonthon2023ensemble} or synthetic
+    \cite{golmohammadi2015time}, and the shortage of public labelled data is a known
+    obstacle~\cite{hilal2022financial}.
+    \item The inflation caused by point adjustment has been measured on industrial and
+    operations benchmarks~\cite{kim2022towards,wu2023current} but not on financial data.
+    \item Large anomaly detection benchmarks contain no financial
+    series~\cite{paparrizos2022tsb,schmidl2022anomaly}.
+\end{enumerate}
+
+This thesis addresses the first five directly. It compares an autoencoder on raw and on
+GARCH-standardized returns, analyses false alarms by volatility regime, evaluates on DSE
+data with time-based splits, transfers detectors from global indices to the DSE, and builds
+labels from three sources: known market events, extreme standardized residuals and injected
+anomalies. It addresses the sixth by reporting point-adjusted and unadjusted scores side by
+side.
+
+\section{Summary of Literature Review}
+GARCH-family models describe DSE volatility well in sample, and deep detectors work on
+sensor and operations data, but the two have not been combined for anomaly detection in
+stock markets, and nothing comparable exists for the DSE. Evaluation practice in the field
+also overstates performance when point adjustment is used. Chapter~\ref{ch:method} describes
+the data, labels, models and evaluation protocol designed around these gaps.
