@@ -1,78 +1,196 @@
 % Chapter 3: Methodology (the paper plan's "Data and Labeling" and "Method").
-% Project rules that must hold throughout: time-based splits only, volatility models
+% Project rules that hold throughout: time-based splits only, volatility models
 % fitted on the training block only, fixed seeds (config.yaml, seed 42).
+\label{ch:method}
 
 \section{Introduction}
-\todo{Overview of the quantitative, experimental design and the structure of this chapter.}
+This chapter describes the data, the volatility models, the anomaly labels, the detectors
+and the evaluation protocol. The study is quantitative and experimental. Two comparisons
+drive it: a detector trained on raw returns against the same detector trained on
+GARCH-standardized returns, and a detector trained on global market indices and applied to
+the Dhaka Stock Exchange (DSE) against one trained on DSE data. Sections marked as planned
+describe work that has not yet been run.
 
 \section{Research Design}
-% Experimental, deductive. Two comparisons drive the thesis:
-% (1) raw versus GARCH-standardized inputs; (2) global-to-DSE transfer.
-\todo{Research design and how each research question maps to an experiment.}
+\todo{Map each research question in Chapter 1 to the experiment that answers it.}
 
 \section{Data Collection}
 
 \subsection{Global Market Data}
-\todo{Indices, source (e.g., Yahoo Finance), date ranges.}
+Global index data come from Yahoo Finance through the \texttt{yfinance} Python package. The
+first index used is the S\&P~500 (\texttt{\^{}GSPC}), daily, from January 2010 to December
+2025. \todo{List the other global indices once chosen.}
+
+The preliminary results in Chapter~4 were produced before Yahoo Finance could be reached
+from the development environment. They use the copy of S\&P~500 daily prices that ships with
+the Python \texttt{arch} package, which covers January 1999 to December 2018 and was
+originally sourced from Yahoo Finance.
 
 \subsection{Dhaka Stock Exchange Data}
-% DSEX from January 2013 (do not splice DGEN). Stocks from the DSE day-end archive,
-% cross-checked against the Mendeley dataset. Scripts: scripts/fetch_dse.py, scripts/qc_dse.py.
-\todo{DSEX and stock sources, coverage, and quality checks.}
+The DSE publishes daily data for listed stocks in its day-end archive, with open, high,
+low and close prices, the previous close (\texttt{ycp}), the number of trades, traded value
+and volume. For long-listed stocks the archive goes back to about 1999. Index levels come
+from the DSE market summary pages. Both sources are accessed through the open-source
+\texttt{bdshare} package. A public dataset on Mendeley (DSE historical data, 1999 to April
+2025, over 700 tickers) is used to cross-check the pull. It has no previous-close field, so
+it cannot be used to detect corporate-action adjustments.
+
+The market index is the DSE Broad Index (DSEX), which starts on 28 January 2013. Before
+2013 the exchange published the DSE General Index (DGEN), which used a different method. The
+two series are not spliced, so the DSE index sample begins in 2013.
+
+Intraday DSE data are not freely available; the only historical source found is a paid
+commercial feed. This thesis therefore uses daily data only.
+
+\todo{Report the result of the DSE pull: number of DSEX rows, stocks retained and their
+spans. The plan proceeds with daily data if DSEX has at least 3{,}000 rows from 2013 and at
+least ten stocks have ten or more years with under 2\% missing days outside floor-price
+periods. If the pull fails, the fallback market is India (NIFTY~50 and large-cap NSE
+stocks through \texttt{yfinance}).}
 
 \section{Data Cleaning and Preprocessing}
-% DSE traps: BSEC floor prices (about Mar 2020 to Jun 2021 and Jul 2022 to Jan 2024),
-% unadjusted bonus shares, missing trading days.
-\todo{Return computation, corporate-action adjustment, treatment of floor-price periods.}
+Returns are daily log returns in percent, $r_t = 100\ln(P_t/P_{t-1})$. Scaling by 100 keeps
+the GARCH optimiser well conditioned.
+
+DSE prices need four corrections before returns are computed.
+
+\textbf{Floor prices.} The Bangladesh Securities and Exchange Commission (BSEC) imposed
+minimum prices from about March 2020 to June 2021 and again from July 2022 to January 2024,
+with partial lifting in December 2022 and reimposition in March 2023. During these periods
+many stocks printed the same close with near-zero volume for months. Such flat runs are not
+calm markets and must not be treated as normal behaviour. They are flagged as a separate
+regime, and results are reported with and without them. The dates above come from press
+reports at month level and will be checked against BSEC orders before the label rules are
+fixed.
+
+\textbf{Bonus shares and other corporate actions.} DSE prices are not adjusted, and
+Bangladeshi firms issue bonus shares often, so raw closes fall sharply on record dates. The
+DSE resets the previous close after a corporate action. A day on which \texttt{ycp} differs
+from the prior day's close is treated as an adjustment day, and the earlier part of the
+series is scaled by the ratio of the two. This rule is an inference about how the DSE sets
+\texttt{ycp} and will be spot-checked against known bonus dates.
+
+\textbf{Price limits.} Daily moves on the DSE are capped, at about $\pm 10\%$ for most of
+the sample, so returns are truncated. Days that close at a limit are flagged rather than
+treated as ordinary extreme returns.
+
+\textbf{Calendar and liquidity.} DSEX trading dates define the calendar. Missing days and
+zero-volume days are counted for each stock, and the final 10 to 20 stocks are chosen by
+median daily turnover.
 
 \section{Train, Validation and Test Splits}
-\todo{Date boundaries for each market; justify time-based splits and the absence of shuffling.}
+All splits are by date, with no shuffling, so that no information from a later period is
+used to fit or tune anything evaluated on an earlier one. For the S\&P~500 from
+\texttt{yfinance}, the training block ends on 31 December 2018, validation covers 2019 to
+2021, and the test block is everything from 2022 on. For the preliminary run on the bundled
+1999 to 2018 series, training covers 1999 to 2012, validation 2013 to 2015 and test 2016 to
+2018. \todo{DSE split dates.}
 
 \section{Volatility Modelling and Standardization}
-% GARCH(1,1), EGARCH(1,1,1), GJR(1,1,1) with Student-t errors, fitted on train only.
-% Select the model on validation residual diagnostics (Ljung-Box, ARCH-LM), not training BIC alone.
-% Rolling or expanding re-fits before labels are frozen.
-\todo{Model specifications, estimation, model selection and the standardized residual $z_t = \varepsilon_t/\sigma_t$.}
-
+Each return is modelled as a constant mean plus an innovation, $r_t = \mu + \varepsilon_t$,
+with $\varepsilon_t = \sigma_t e_t$ and $e_t$ drawn from a Student-$t$ distribution with
+$\nu$ degrees of freedom, scaled to unit variance. Three models for the conditional variance
+are compared. GARCH(1,1)~\cite{bollerslev1986generalized}:
 \begin{equation}
-\sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2
+\sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2 .
 \end{equation}
+GJR-GARCH(1,1,1)~\cite{glosten1993relation}, where $I_{t-1}=1$ if $\varepsilon_{t-1}<0$ and
+$0$ otherwise:
+\begin{equation}
+\sigma_t^2 = \omega + \left(\alpha + \gamma I_{t-1}\right)\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2 .
+\end{equation}
+EGARCH(1,1,1)~\cite{nelson1991conditional}:
+\begin{equation}
+\ln\sigma_t^2 = \omega + \alpha\left(|e_{t-1}| - \sqrt{2/\pi}\right) + \gamma\, e_{t-1} + \beta\ln\sigma_{t-1}^2 .
+\end{equation}
+In GJR a positive $\gamma$, and in EGARCH a negative $\gamma$, means that negative returns
+raise volatility more than positive returns of the same size.
+
+Parameters are estimated by maximum likelihood on the training block only. The fitted
+parameters are then held fixed and the model is run forward over the whole series as a
+one-step-ahead filter, so $\sigma_t$ on any validation or test day depends only on returns
+up to day $t-1$ and on parameters estimated from training data. The standardized residual
+is $z_t = (r_t - \mu)/\sigma_t$. All models are fitted with the \texttt{arch} Python package.
+
+Model adequacy is checked on each block separately with Ljung-Box tests~\cite{ljung1978measure}
+on $z_t$ and $z_t^2$ at 10 and 20 lags, an ARCH-LM test at 10 lags, and a Jarque-Bera test
+of normality. The volatility model used for labels and inputs is chosen on the validation
+diagnostics, not on training-sample BIC alone, because the preliminary results in
+Chapter~4 show that the two can disagree. Before labels are fixed, the frozen-parameter
+filter will be compared with rolling or expanding re-estimation.
 
 \section{Anomaly Label Construction}
-% Three label sources: known market events, extreme standardized residuals, injected anomalies.
-\todo{Define each label source, its thresholds, and how labels are kept out of model training.}
+
+\subsection{Statistical Labels from Standardized Residuals}
+A day is labelled anomalous if its standardized residual falls in the two-sided tail of
+probability $p$ under the fitted unit-variance Student-$t$ distribution:
+\begin{equation}
+|z_t| > c, \qquad c = t_{\nu,\,1-p/2}\sqrt{\frac{\nu-2}{\nu}} ,
+\end{equation}
+where $t_{\nu,q}$ is the $q$ quantile of the standard Student-$t$ distribution. With
+$p = 0.002$, a correctly specified model flags about one day in 500.
+
+For comparison, a naive rule without a volatility model standardizes returns by the
+training-block mean and standard deviation and flags days beyond the normal quantile for
+the same tail probability.
+
+\subsection{Other Label Sources (planned)}
+\todo{Known market events: the event list and how its dates were sourced. Injected
+anomalies: types, magnitudes and injection protocol. Freeze all three label rules in
+docs/labeling\_rules.md before any detector is trained.}
 
 \section{Detection Models}
 
 \subsection{Baselines}
-\todo{Statistical and classical baselines (e.g., raw-return z-score, GARCH residual threshold).}
+The first baselines are the two statistical rules above: a threshold on the raw-return
+z-score and a threshold on the GARCH-standardized residual. \todo{Add classical detectors
+if used.}
 
-\subsection{Autoencoder on Raw versus GARCH-Standardized Returns}
-\todo{Architecture, window length, anomaly score $s_t$ and threshold $\tau$; identical settings for both input types.}
+\subsection{Autoencoder on Raw versus GARCH-Standardized Returns (planned)}
+\todo{Architecture, window length, training data, anomaly score $s_t$ and threshold
+$\tau$. Both input types use identical settings, so the only difference is the input.}
 
-\section{Transfer Learning Protocol}
-\todo{Train on global markets, apply to the DSE zero-shot and after fine-tuning; what is frozen and what is re-fitted.}
+\section{Transfer Learning Protocol (planned)}
+\todo{Training on global indices, then applying to DSE data without retraining (zero-shot)
+and after fine-tuning. State which parts are frozen and whether the volatility model is
+re-estimated on DSE training data.}
 
 \section{Evaluation Metrics}
-% Report event-based F1 together with point-adjusted F1 (and PA%K), and quantify the gap.
-\todo{Define event-based precision, recall and F1, point adjustment, and PA\%K.}
-
+Detectors are scored against labelled anomalous events. Precision, recall and $F_1$ are
 \begin{equation}
-Precision=\frac{TP}{TP+FP}, \qquad Recall=\frac{TP}{TP+FN}
+Precision=\frac{TP}{TP+FP}, \qquad Recall=\frac{TP}{TP+FN},
 \end{equation}
-
 \begin{equation}
-F_1=\frac{2\times Precision \times Recall}{Precision+Recall}
+F_1=\frac{2\times Precision \times Recall}{Precision+Recall},
 \end{equation}
+where $TP$, $FP$ and $FN$ count true positives, false positives and false negatives.
+
+Three versions of $F_1$ are reported together. Event-based $F_1$ counts each labelled event
+once. Point-adjusted $F_1$ (F1-PA)~\cite{xu2018unsupervised} counts every point of an event as
+detected if any one of its points is detected. PA\%K~\cite{kim2022towards} applies the
+adjustment only when at least $K$\% of the event's points are detected. Because point
+adjustment can make random scores look competitive~\cite{kim2022towards}, the gap between
+F1-PA and the stricter scores is reported as a result in its own right.
+\todo{Fix $K$ and decide whether to add VUS-PR~\cite{paparrizos2022volume}.}
 
 \section{Reproducibility}
-\todo{Seeds, software versions, code repository, data availability.}
+All settings, including split dates, model specifications and label thresholds, are kept in
+one configuration file (\texttt{config.yaml}) in the project repository. Random seeds are
+fixed at 42 for Python, NumPy and PyTorch. The code is public at
+\url{https://github.com/smhasibul0/dse-anomaly-detection}. \todo{Software versions.}
 
 \section{Ethical Considerations}
-\todo{Public market data only; no personal data; licence terms of the data sources.}
+The study uses public market prices only and no personal data. The DSE website terms and
+the licence of the Mendeley dataset have not been reviewed, so the code and download
+scripts will be released but raw DSE prices will not be redistributed until the terms are
+confirmed.
 
 \section{Limitations of the Methodology}
-\todo{Daily data only, label uncertainty, regulatory distortions in DSE prices.}
+The data are daily, so anomalies that begin and end within a trading day are invisible.
+DSE prices are distorted by floor-price regimes and price limits, and the corporate-action
+adjustment relies on an inferred rule. Statistical labels depend on the chosen volatility
+model and threshold, and real manipulation cases on the DSE are not publicly labelled.
+\todo{Add limitations found while running the experiments.}
 
 \section{Summary of the Chapter}
-\todo{Recap of data, labels, models and evaluation.}
+\todo{Recap once the planned sections are complete.}
