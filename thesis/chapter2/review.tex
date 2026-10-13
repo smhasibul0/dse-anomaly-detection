@@ -32,9 +32,18 @@ remaining volatility clustering, so a day with a large $|z_t|$ is unusual relati
 volatility of its own period rather than relative to the whole sample.
 
 \subsection{Anomalies in Financial Time Series}
-\todo{Define point, contextual and collective anomalies, and state which kind this thesis
-targets. Golmohammadi and Zaiane~\cite{golmohammadi2015time} is a starting point for
-contextual anomalies in stock prices.}
+Anomalies in time series are commonly divided into three kinds. A point anomaly is a
+single observation that is unusual compared with the rest of the data. A contextual anomaly
+is unusual only given its context, such as its time or the behaviour of related series; a
+value that is normal in one setting can be anomalous in another. A collective anomaly is a
+sequence of observations that is unusual as a whole, even if no single value is.
+Golmohammadi and Zaiane~\cite{golmohammadi2015time} treat market manipulation as a
+contextual anomaly, using a stock's peer group as the context.
+
+This thesis treats the volatility of the surrounding period as the context. A return is
+anomalous if it is extreme relative to the conditional volatility at that time, so the same
+fall can be anomalous in a calm year and normal in a crisis. Documented market events,
+which may last several days, are treated as collective anomalies and evaluated as segments.
 
 \section{Review of Key Themes}\label{sec:lr-themes}
 

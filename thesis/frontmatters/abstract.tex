@@ -1,6 +1,18 @@
-% One paragraph, roughly 200-300 words. Write it last.
-% Suggested order: problem (volatility clustering makes deep detectors flag calm-vs-turbulent
-% regime shifts), approach (GARCH-standardized inputs, global-to-DSE transfer), data and
-% evaluation (time-based splits, event-based F1 alongside point-adjusted F1), main result,
-% and what it means for DSE market surveillance.
-\todo{Abstract. State the problem, the approach, the data, the headline result and its implication.}
+Daily stock returns alternate between calm and turbulent periods. Deep anomaly detectors
+trained on raw returns therefore tend to flag whole turbulent periods rather than
+individual abnormal days, and no deep, out-of-sample anomaly detection study exists for the
+Dhaka Stock Exchange (DSE). This thesis proposes a volatility-aware approach. Returns are
+standardized by the conditional volatility of GARCH, EGARCH or GJR models fitted on
+training data only, and an LSTM autoencoder trained on the standardized returns is compared
+with the same autoencoder trained on raw returns. Because the DSE has a short clean history,
+detectors are trained on global market indices and transferred to the DSE, both without
+retraining and after fine-tuning. Anomaly labels come from three sources fixed before any
+model is trained: known market events, extreme standardized residuals and injected
+anomalies. Detectors are evaluated with event-based F1 alongside point-adjusted F1 over five
+random seeds, with time-based splits and a separate analysis of calm and volatile periods.
+DSE data are taken from the DSEX index from 2013 and liquid stocks, with corrections for
+floor-price periods and bonus-share adjustments. A preliminary run on S\&P~500 data from
+1999 to 2018 supports the design: the volatility model with the best training fit failed
+residual tests on the test period, while a rule based on GARCH-standardized residuals
+flagged 17 days spread across the sample, against 54 days concentrated in crisis years for
+a rule on raw returns.

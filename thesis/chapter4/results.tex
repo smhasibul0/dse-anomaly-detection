@@ -5,8 +5,9 @@
 \section{Overview of the Chapter}
 Section~\ref{sec:prelim} reports a preliminary run of the volatility models and statistical
 labels on S\&P~500 data. It was run to test the pipeline and the leakage rules before any
-DSE data were available, and its numbers are not the thesis results. The remaining sections
-will hold the main experiments.
+DSE data were available, and its numbers are not the thesis results. The chapter then
+states the expected outcome for each hypothesis. The main results will be added once the
+experiments have been run.
 
 \section{Preliminary Results: Volatility Models on the S\&P~500}\label{sec:prelim}
 
@@ -30,6 +31,7 @@ indicate fat tails.
 \caption{Training-block estimates (S\&P~500, 1999 to 2012, Student-$t$ innovations).}
 \label{tab:garch-fit}
 \begin{center}
+\small\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrrrrrr}
 \hline
 Model & Log-lik. & BIC & $\alpha$ & $\beta$ & $\gamma$ & Persistence & $\nu$ \\
@@ -122,28 +124,41 @@ flagged, moving flags away from crisis periods towards days that were unusual fo
 period, which is the effect the autoencoder comparison will test. All three need to be
 checked on DSE data.
 
-\section{Experimental Setup}
-\todo{Hardware, software versions, hyperparameters, seeds and date splits for the main
-experiments.}
+\section{Expected Outcomes}
+The main experiments have not been run. This section states what each hypothesis predicts
+and what result would count against it, so that the results can be judged against
+expectations fixed in advance.
 
-\section{Volatility Model Selection on DSE Data}
-\todo{Repeat Tables~\ref{tab:garch-fit} and~\ref{tab:garch-diag} for DSEX and the selected
-stocks.}
+\textbf{H1 (GARCH standardization).} The preliminary run shows that a threshold on raw
+returns concentrates its flags in crisis years, while a threshold on standardized residuals
+spreads them across the sample. If H1 holds, the raw-input autoencoder will show the same
+pattern: more false alarms in the volatile regime and lower event-based F1 than the
+standardized-input autoencoder. If the two autoencoders perform the same, or the raw model
+does better on events labelled from market records, H1 is rejected for that label source.
+A mixed outcome, in which standardization helps in some regimes and not others, is also
+possible and will be reported as such.
 
-\section{Baseline Results}
-\todo{Performance of the statistical baselines on each label source.}
+\textbf{H2 (transfer).} If H2 holds, the zero-shot detector trained on global indices will
+score above the statistical baselines on the DSE, and fine-tuning will narrow the gap to,
+or exceed, the DSE-only detector. Standardized inputs are expected to transfer better than
+raw ones, because removing each market's volatility level makes inputs from different
+markets more comparable. If zero-shot transfer does not beat the baselines, the result will
+show the limits of transfer into a frontier market with regulatory price distortions.
 
-\section{Raw versus GARCH-Standardized Autoencoder}
-\todo{Main comparison: event-based F1, F1-PA and PA\%K for both input types.}
+\textbf{H3 (point adjustment).} Given earlier findings on industrial
+benchmarks~\cite{kim2022towards}, point-adjusted F1 is expected to exceed event-based F1 for
+every detector, and the ranking of detectors may change between the two. A small gap would
+also be informative: it would suggest that point adjustment matters less when most anomalies
+last a single day.
 
-\section{Transfer from Global Markets to the DSE}
-\todo{Zero-shot versus fine-tuned results on the DSE.}
-
-\section{Regime Analysis of False Alarms}
-\todo{False alarms in calm and volatile periods for raw and standardized inputs.}
-
-\section{Discussion}
-\todo{Interpret the results against the research questions and prior work.}
+\section{Main Results}
+\todo{To be added after the experiments in Weeks 6 to 10: volatility model selection on DSE
+data, baseline results, the raw versus standardized autoencoder comparison, transfer
+results, the regime analysis and the evaluation gap.}
 
 \section{Summary of the Chapter}
-\todo{Key findings that Chapter 5 builds on.}
+The preliminary run confirmed that the pipeline works end to end and led to three design
+decisions: choose the volatility model on validation diagnostics, re-estimate it before
+labels are fixed, and expect volatility standardization to move flags away from crisis
+periods. The expected outcomes above set the criteria against which the main results will be
+judged.
