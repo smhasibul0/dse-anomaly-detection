@@ -1,0 +1,31 @@
+# Single source of truth for a run. Change values here, not in code.
+seed: 42
+
+data:
+  ticker: "^GSPC"
+  start: "2010-01-01"
+  end: "2025-12-31"
+  # If yfinance cannot be reached, fall back to the S&P 500 copy bundled
+  # with the `arch` package (1999-01-04 to 2018-12-31, sourced from Yahoo).
+  allow_offline_fallback: true
+
+# Time-based splits only. Dates are inclusive end dates of each block.
+splits:
+  yfinance:
+    train_end: "2018-12-31"
+    val_end: "2021-12-31"      # test = everything after val_end
+  offline_fallback:
+    train_end: "2012-12-31"
+    val_end: "2015-12-31"
+
+garch:
+  returns_scale: 100           # percent log returns, keeps the optimiser well conditioned
+  mean: "Constant"
+  dist: "t"                    # Student-t innovations
+  models: ["GARCH", "EGARCH", "GJR"]
+  diag_lags: [10, 20]
+
+labels_first_look:
+  # Two-sided tail probability under the fitted standardized Student-t.
+  # 0.002 means about 1 flag per 500 days if the model were exactly right.
+  tail_prob: 0.002

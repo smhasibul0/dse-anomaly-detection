@@ -1,0 +1,2 @@
+id,authors,year,title,venue,link,theme,method,data_market,frequency,period,labels_ground_truth,metrics,uses_point_adjust,volatility_model,transfer_or_cross_market,code_available,stated_limitations,relevance_1to5,notes,read_by
+1,,,,,,"GARCH+DL | financial anomaly | TS-AD benchmark | emerging markets",,,,,,,,,,,,,,

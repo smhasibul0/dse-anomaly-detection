@@ -1,0 +1,12 @@
+# Data stays out of git (licensing + size). Keep folder structure only.
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+reports/**/*.png
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+mlruns/
+wandb/

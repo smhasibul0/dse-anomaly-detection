@@ -1,0 +1,12 @@
+,value
+source,offline_fallback
+best_model_by_BIC,EGARCH
+nu,9.480644726270874
+thr_garch_|z|,3.7468635248711135
+thr_raw_|z|,3.090232306167813
+n_days,5030
+expected_flags_if_model_exact,10.06
+n_flag_garch,17
+n_flag_raw,54
+flag_raw_share_in_top3_years,0.7592592592592593
+flag_garch_share_in_top3_years,0.47058823529411764
