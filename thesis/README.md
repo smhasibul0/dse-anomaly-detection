@@ -73,9 +73,5 @@ still need a click-check; page numbers are missing for most entries.
 
 ## IEEE paper
 
-The 6 to 8 page IEEE paper is a second target and will be cut down from these chapters.
-Introduction and Literature Review condense into the paper's Introduction and Related Work.
-Chapter 3 splits into Data and Labeling and Method. Chapter 4 becomes Experiments and
-Results, and Chapter 5 becomes Limitations and Conclusion. Write each section so its first
-paragraph can stand on its own in the paper. Both documents share
-`backmatters/references.bib`, which is already in IEEE style.
+On hold while the thesis book is written. When it resumes, the paper will be cut down from
+these chapters and use the same `backmatters/references.bib`.
